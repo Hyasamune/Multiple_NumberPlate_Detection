@@ -24,6 +24,7 @@
 [**Tahap 4 Penggunaan**](#_toc192543095)
 # <a name="_toc192541693"></a><a name="_toc192543088"></a>**Deskripsi**
 ![Aspose Words 44f620a8-e744-4343-877b-3b8b4fc56b81 001](https://github.com/user-attachments/assets/a570abe0-cd01-407e-b634-161d5153708c)
+
 Aplikasi ini digunakan untuk mendeteksi beberapa plat nomor dalam satu gambar, dengan jumlah 3 hingga 5 plat nomor pada kendaraan. Aplikasi ini akan memberikan output berupa :
 
 1. seluruh hasil kotak penemuan/*bounding box* yang menandai plat nomor yang terdeteksi.
