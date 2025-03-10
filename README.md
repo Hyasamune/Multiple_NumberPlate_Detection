@@ -56,7 +56,8 @@ Keunggulan utama pada aplikasi ini adalah kemampuannya dalam mendeteksi beberapa
 - Aplikasi ini berjalan menggunakan *python* dan memerlukan instalasi dependensi tertentu sebelum digunakan.
 # <a name="_toc192541695"></a><a name="_toc192543090"></a>**Alur Kerja Aplikasi**
 ![Aspose Words 44f620a8-e744-4343-877b-3b8b4fc56b81 002](https://github.com/user-attachments/assets/bc9fa40b-5635-4113-8cb7-f8262663d715)
-	Gambar diatas ini merupakan alur kerja dari aplikasi untuk melakukan deteksi beberapa plat nomor kendaraan dalam satu gambar.
+	
+ Gambar diatas ini merupakan alur kerja dari aplikasi untuk melakukan deteksi beberapa plat nomor kendaraan dalam satu gambar.
 
 1. Aplikasi dimulai dengan penggunakan membuka aplikasi.
 2. Pengguna perlu melakukan upload gambar.
