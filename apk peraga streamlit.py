@@ -3,15 +3,6 @@ import easyocr
 import re
 import numpy as np
 import streamlit as st
-import os
-import time
-
-ocr_results_path = r'' # saving path
-detected_texts_file = os.path.join(ocr_results_path, 'detected_texts.txt')
-detection_results_file = os.path.join(ocr_results_path, 'detection_results.txt')
-ocr_log_file_path = r'' # saving path
-cropped_images_folder = r'' # saving path
-output_path = "" # saving path
 
 def loadImage(imgPath, width = 2000, height = 1124):
     image = cv.imread(imgPath)
@@ -177,32 +168,6 @@ def save_detection_results(detected_plates, detection_file_path, texts_file_path
             detection_file.flush()
             texts_file.flush()
 
-def save_ocr_result(text, texts_file_path):
-    with open(texts_file_path, 'a') as texts_file:
-        texts_file.write(f"{text}\n")
-        texts_file.flush()  # Langsung simpan ke file
-
-# Fungsi untuk menyimpan log hasil OCR ke dalam file log
-def save_ocr_log(ocr_result, window_size, coords, log_file_path):
-    """
-    Simpan hasil OCR beserta ukuran window dan koordinatnya ke dalam file log.
-    """
-    with open(log_file_path, 'a') as log_file:
-        log_file.write(f"OCR Result: '{ocr_result}' at window size {window_size} and coordinates {coords}\n")
-        log_file.flush()  # Langsung simpan ke file tanpa buffer
-
-# Modifikasi fungsi resize_window untuk menyimpan setiap cropped image
-def save_cropped_image(cropped_image, x, y, width, height):
-    """
-    Save the cropped image to the specified folder with a unique filename based on coordinates.
-    """
-    file_name = f'cropped_window_{x}_{y}_{width}x{height}.png'
-    file_path = os.path.join(cropped_images_folder, file_name)
-    
-    # Menyimpan cropped image sebagai file PNG
-    cv.imwrite(file_path, cropped_image)
-    # print(f'Saved cropped image at {file_path}')
-
 # Fungsi untuk memperbesar ukuran window dan mengembalikan koordinat serta hasil OCR
 def resize_window(image, x, y, initial_width, initial_height, max_window_size, scale_height=1.4, scale_width=1.75):
     width, height = initial_width, initial_height
@@ -228,17 +193,9 @@ def resize_window(image, x, y, initial_width, initial_height, max_window_size, s
             print(f"Invalid cropped image at coordinates ({x}, {y}), skipping...") 
             return None, None, None
 
-        # Save the cropped image
-        save_cropped_image(cropped_image, x, y, width, height)
-
         # setiap cropped_image akan langsung menerapkan OCR
         ocr_result = OCR(cropped_image)
         print(f"OCR Result: '{ocr_result}' at window size ({width}x{height})")
-
-        # Simpan hasil OCR ke dalam file log
-        save_ocr_log(ocr_result, (width, height), (x, y, x2, y2), ocr_log_file_path)
-
-        save_ocr_result(ocr_result, detected_texts_file)
 
         # Validasi hasil OCR untuk memastikan formatnya sesuai dengan plat nomor
         if ocr_result and validate_plate_format(ocr_result):
@@ -372,10 +329,6 @@ if uploaded_file is not None:
             # Backtracking untuk segmentasi
             filled_image_putih = backtrack_fill(threshold_image_putih, threshold=128, min_pixel=30, max_pixel=210)
 
-            # Simpan gambar
-            cv.imwrite(output_path, filled_image_putih)
-            print(f"Gambar telah disimpan di {output_path}")
-
             # Simpan ke session_state dan tampilkan
             st.session_state.filled_image = filled_image_putih
             st.image(filled_image_putih, caption="Hasil Preprocessing Plat Putih", use_container_width=True)
@@ -393,10 +346,6 @@ if uploaded_file is not None:
 
             # Backtracking untuk segmentasi
             filled_image_hitam = backtrack_fill(threshold_image_hitam, threshold=128, min_pixel=30, max_pixel=520)
-
-            # Simpan gambar
-            cv.imwrite(output_path, filled_image_hitam)
-            print(f"Gambar telah disimpan di {output_path}")
 
             # Simpan ke session_state dan tampilkan
             st.session_state.filled_image = filled_image_hitam
@@ -444,19 +393,8 @@ if uploaded_file is not None:
 # Tombol untuk melakukan deteksi plat nomor
 if st.session_state.get("filled_image") is not None and st.button("Deteksi Plat Nomor"):
     start_coords = (0, st.session_state.y1, st.session_state.filled_image.shape[1], st.session_state.y2)
-    # Mulai pencatatan waktu
-    start_time = time.time()
     
     detected_plates = process_plate_detection_opt(st.session_state.filled_image, start_coords)
-
-    # Selesai pencatatan waktu
-    end_time = time.time()
-
-    # Hitung dan tampilkan waktu proses
-    processing_time = end_time - start_time
-    print(f"Waktu proses sliding window deteksi: {processing_time:.2f} detik")
-
-    save_detection_results(detected_plates, detection_results_file, detected_texts_file)
 
     if detected_plates.size > 0:
         # Tampilkan hasil deteksi dengan bounding box
